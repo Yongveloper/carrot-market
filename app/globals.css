@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+@theme {
+  --radius-sexy-name: 11.11px;
+
+  --margin-tomato: 120px;
+}
