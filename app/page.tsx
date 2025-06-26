@@ -8,12 +8,11 @@ export default function Home() {
             className="w-full bg-gray-100"
             placeholder="Write your email"
           />
+          <a>aaa</a>
           <span className="hidden group-focus-within:block">
             Make sure it is a valid email...
           </span>
-          <button className="rounded-sexy-name mt-tomato h-10 w-full bg-black text-white">
-            Submit
-          </button>
+          <button className="btn">Submit</button>
         </div>
       </div>
     </main>

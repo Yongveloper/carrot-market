@@ -4,3 +4,21 @@
 
   --margin-tomato: 120px;
 }
+
+@layer base {
+  a {
+    @apply text-blue-500;
+  }
+}
+
+@layer utilities {
+  .text-bigger-hello {
+    @apply text-3xl font-semibold;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply rounded-sexy-name mt-tomato h-10 w-full bg-black text-white;
+  }
+}
