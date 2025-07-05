@@ -6,6 +6,7 @@ interface IFormInputProps {
   required: boolean;
   errors: string[];
   name: string;
+  defaultValue?: string;
 }
 
 export default function FormInput({
@@ -14,6 +15,7 @@ export default function FormInput({
   required,
   errors,
   name,
+  defaultValue = '',
 }: IFormInputProps) {
   return (
     <div className="flex flex-col gap-2">
@@ -23,6 +25,7 @@ export default function FormInput({
         type={type}
         placeholder={placeholder}
         required={required}
+        defaultValue={defaultValue}
       />
       {errors.map((error, index) => (
         <span key={index} className="text-red-500">
