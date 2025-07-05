@@ -24,7 +24,6 @@ export default function Login() {
           type="email"
           placeholder="Email"
           // defaultValue={state?.email ?? ''}
-          errors={state?.errors ?? []}
         />
         <FormInput
           name="password"
@@ -32,7 +31,6 @@ export default function Login() {
           type="password"
           placeholder="Password"
           // defaultValue={state?.password ?? ''}
-          errors={state?.errors ?? []}
         />
         <FormButton text="Log in" />
       </form>

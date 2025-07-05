@@ -4,7 +4,7 @@ interface IFormInputProps {
   type: InputHTMLAttributes<HTMLInputElement>['type'];
   placeholder: string;
   required: boolean;
-  errors: string[];
+  errors?: string[];
   name: string;
   defaultValue?: string;
 }
@@ -13,7 +13,7 @@ export default function FormInput({
   type,
   placeholder,
   required,
-  errors,
+  errors = [],
   name,
   defaultValue = '',
 }: IFormInputProps) {
