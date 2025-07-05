@@ -1,6 +1,10 @@
 'use server';
 import { z } from 'zod';
 
+const passwordRegex = new RegExp(
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/,
+);
+
 const checkUsername = (username: string) => !username.includes('lala');
 
 const checkPasswords = ({
@@ -20,10 +24,19 @@ const formSchema = z
       })
       .min(3, 'Way too short!!')
       .max(10, 'That is too looong!')
+      .toLowerCase()
+      .trim()
+      .transform((username) => `😀${username}`)
       .refine(checkUsername, 'custrom error'),
-    email: z.string().email(),
-    password: z.string().min(10),
-    confirm_password: z.string().min(10),
+    email: z.string().email().toLowerCase().trim(),
+    password: z
+      .string()
+      .min(4)
+      .regex(
+        passwordRegex,
+        'A password must have lowercase, UPPERCASE, a number and special characters.',
+      ),
+    confirm_password: z.string().min(4),
   })
   .refine(checkPasswords, {
     message: 'Both passwords should be the same',
@@ -41,11 +54,11 @@ export async function createAccount(prevState: any, formData: FormData) {
   const result = formSchema.safeParse(data);
 
   if (!result.success) {
-    console.log(result.error.flatten());
-
     return {
       ...result.error.flatten(),
       ...data,
     };
   }
+
+  console.log(result.data);
 }
