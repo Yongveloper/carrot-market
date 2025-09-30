@@ -10,11 +10,11 @@ const publicOnlyUrls: IRoutes = {
   '/login': true,
   '/sms': true,
   '/create-account': true,
+  '/github/start': true,
+  '/github/complete': true,
 };
 
 export async function middleware(request: NextRequest) {
-  console.log('hello');
-
   const session = await getSession();
   const exists = publicOnlyUrls[request.nextUrl.pathname];
 
@@ -30,5 +30,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
