@@ -7,6 +7,7 @@ import {
 } from '@/lib/constants';
 import db from '@/lib/db';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 
 const checkUsername = (username: string) => !username.includes('lala');
 
@@ -53,7 +54,7 @@ const formSchema = z
       })
       .toLowerCase()
       .trim()
-      .refine(checkUsername, 'custrom error')
+      .refine(checkUsername, 'custom error')
       .refine(checkUniqueUsername, 'This username is already taken'),
     email: z
       .string()
@@ -92,8 +93,19 @@ export async function createAccount(prevState: any, formData: FormData) {
     };
   }
 
-  // check if username is taken
-  // check if the email is already used
+  const hashedPassword = await bcrypt.hash(result.data.password, 12);
+  const user = await db.user.create({
+    data: {
+      username: result.data.username,
+      email: result.data.email,
+      password: hashedPassword,
+    },
+    select: {
+      id: true,
+    },
+  });
+  console.log(user);
+
   // hash password
   // save the user to db
   // log the user in
