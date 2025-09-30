@@ -30,11 +30,12 @@ const formSchema = z.object({
     .email()
     .toLowerCase()
     .refine(checkEmailExists, 'An account with this email does not exist'),
-  password: z.string({
-    required_error: 'Password is required',
-  }),
-  // .min(PASSWORD_MIN_LENGTH)
-  // .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
+  password: z
+    .string({
+      required_error: 'Password is required',
+    })
+    .min(PASSWORD_MIN_LENGTH)
+    .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
 });
 
 export async function login(prevState: any, formData: FormData) {
