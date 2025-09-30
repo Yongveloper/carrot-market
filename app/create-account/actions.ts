@@ -122,4 +122,6 @@ export async function createAccount(prevState: any, formData: FormData) {
   });
 
   await sessionLogin(user?.id as number);
+
+  redirect('/profile');
 }

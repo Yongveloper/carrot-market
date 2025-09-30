@@ -56,10 +56,19 @@ export async function GET(request: NextRequest) {
     return redirect('/profile');
   }
 
+  const username = await db.user.findUnique({
+    where: {
+      username: login,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   const newUser = await db.user.create({
     data: {
       github_id: String(id),
-      username: login,
+      username: Boolean(username) ? `${login}_${crypto.randomUUID()}` : login,
       avatar: avatar_url,
     },
     select: {
