@@ -8,6 +8,9 @@ import {
 import db from '@/lib/db';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
+import { getIronSession } from 'iron-session';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const checkUsername = (username: string) => !username.includes('lala');
 
@@ -77,6 +80,7 @@ const formSchema = z
   });
 
 export async function createAccount(prevState: any, formData: FormData) {
+  console.log(cookies());
   const data = {
     username: formData.get('username') as string,
     email: formData.get('email') as string,
@@ -104,10 +108,15 @@ export async function createAccount(prevState: any, formData: FormData) {
       id: true,
     },
   });
-  console.log(user);
 
-  // hash password
-  // save the user to db
   // log the user in
-  // redirect '/home'
+  const cookie = await getIronSession(await cookies(), {
+    cookieName: 'delicious-karrot',
+    password: process.env.COOKIE_PASSWORD!,
+  });
+  //@ts-ignore
+  cookie.id = user.id;
+  await cookie.save();
+
+  redirect('/profile');
 }
