@@ -11,6 +11,7 @@ import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import getSession from '@/lib/session';
+import sessionLogin from '@/lib/sessionLogin';
 
 const checkUsername = (username: string) => !username.includes('lala');
 
@@ -120,10 +121,5 @@ export async function createAccount(prevState: any, formData: FormData) {
     },
   });
 
-  const session = await getSession();
-  session.id = user.id;
-
-  await session.save();
-
-  redirect('/profile');
+  await sessionLogin(user?.id as number);
 }
