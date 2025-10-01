@@ -6,6 +6,8 @@ import { redirect } from 'next/navigation';
 import db from '@/lib/db';
 import crypto from 'crypto';
 import sessionLogin from '@/lib/sessionLogin';
+import { Vonage } from '@vonage/server-sdk';
+import { Auth } from '@vonage/auth';
 
 const phoneSchema = z
   .string()
@@ -96,7 +98,20 @@ export async function smsLogIn(prevState: IActionState, formData: FormData) {
         },
       },
     });
-    // send the token using twilio
+
+    const credentials = new Auth({
+      apiKey: process.env.VONAGE_API_KEY,
+      apiSecret: process.env.VONAGE_API_SECRET,
+    });
+
+    const vonage = new Vonage(credentials);
+    await vonage.sms.send({
+      to: process.env.MY_PHONE_NUMBER!,
+      //to: result.data,
+      from: process.env.VONAGE_SMS_FROM!,
+      text: `Your Karrot verification code is: ${token}`,
+    });
+
     return {
       phone: result.data,
       token: true,
