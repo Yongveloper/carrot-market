@@ -5,6 +5,7 @@ import validator from 'validator';
 import { redirect } from 'next/navigation';
 import db from '@/lib/db';
 import crypto from 'crypto';
+import sessionLogin from '@/lib/sessionLogin';
 
 const phoneSchema = z
   .string()
@@ -14,7 +15,24 @@ const phoneSchema = z
     'Wrong phone format',
   );
 
-const tokenSchema = z.coerce.number().min(100_000).max(999_999);
+async function tokenExists(token: number) {
+  const exists = await db.sMSToken.findUnique({
+    where: {
+      token: token.toString(),
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return Boolean(exists);
+}
+
+const tokenSchema = z.coerce
+  .number()
+  .min(100_000)
+  .max(999_999)
+  .refine(tokenExists, 'This token does not exists');
 
 interface IActionState {
   phone: string;
@@ -85,7 +103,8 @@ export async function smsLogIn(prevState: IActionState, formData: FormData) {
     };
   }
 
-  const result = tokenSchema.safeParse(token);
+  const result = await tokenSchema.spa(token);
+
   if (!result.success) {
     return {
       token: true,
@@ -94,5 +113,24 @@ export async function smsLogIn(prevState: IActionState, formData: FormData) {
     };
   }
 
-  redirect('/');
+  const smsToken = await db.sMSToken.findUnique({
+    where: {
+      token: result.data.toString(),
+    },
+    select: {
+      id: true,
+      userId: true,
+    },
+  });
+
+  if (smsToken) {
+    await sessionLogin(smsToken.userId);
+    await db.sMSToken.delete({
+      where: {
+        id: smsToken.id,
+      },
+    });
+  }
+
+  redirect('/profile');
 }

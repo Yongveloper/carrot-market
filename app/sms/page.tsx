@@ -29,6 +29,7 @@ export default function SMSLogin() {
             placeholder="Verification code"
             min={100_000}
             max={999_999}
+            errors={state.error?.formErrors}
           />
         ) : (
           <Input
