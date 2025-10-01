@@ -118,19 +118,23 @@ export async function smsLogIn(prevState: IActionState, formData: FormData) {
     };
   }
 
-  const result = await tokenSchema.spa(token);
+  const tokenResult = await tokenSchema.spa(token);
+  const phoneResult = phoneSchema.safeParse(phone);
 
-  if (!result.success) {
+  if (!tokenResult.success) {
     return {
       token: true,
       phone: prevState.phone,
-      error: result.error.flatten(),
+      error: tokenResult.error.flatten(),
     };
   }
 
   const smsToken = await db.sMSToken.findUnique({
     where: {
-      token: result.data.toString(),
+      token: tokenResult.data.toString(),
+      user: {
+        phone: phoneResult.data,
+      },
     },
     select: {
       id: true,
