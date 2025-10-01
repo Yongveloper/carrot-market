@@ -4,7 +4,7 @@ import { formatToWon } from '@/lib/utils';
 import { UserIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -52,13 +52,24 @@ export default async function ProductDetail({
 
   const isOwner = await getIsOwner(product.userId);
 
+  const deleteProduct = async () => {
+    'use server';
+    await db.product.delete({
+      where: {
+        id,
+      },
+    });
+
+    redirect('/products');
+  };
+
   return (
     <div>
       <div className="relative aspect-square">
         <Image fill src={product.photo} alt={product.title} />
       </div>
       <div className="flex items-center gap-3 border-b border-neutral-700 p-5">
-        <div className="size-10 rounded-full">
+        <div className="size-10 overflow-hidden rounded-full">
           {product.user.avatar !== null ? (
             <Image
               src={product.user.avatar}
@@ -83,9 +94,11 @@ export default async function ProductDetail({
           {formatToWon(product.price)}
         </span>
         {isOwner && (
-          <button className="rounded-md bg-red-500 px-5 py-2.5 font-semibold text-white">
-            삭제하기
-          </button>
+          <form action={deleteProduct}>
+            <button className="cursor-pointer rounded-md bg-red-500 px-5 py-2.5 font-semibold text-white">
+              삭제하기
+            </button>
+          </form>
         )}
         <Link
           className="rounded-md bg-orange-500 px-5 py-2.5 font-semibold text-white"
