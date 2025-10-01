@@ -1,5 +1,6 @@
 import db from '@/lib/db';
-import getSession from '@/lib/session';
+import * as githubApi from '@/lib/github/api';
+
 import sessionLogin from '@/lib/sessionLogin';
 import { notFound, redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
@@ -11,21 +12,7 @@ export async function GET(request: NextRequest) {
     return notFound();
   }
 
-  const accessTokenParams = new URLSearchParams({
-    client_id: process.env.GITHUB_CLIENT_ID as string,
-    client_secret: process.env.GITHUB_CLIENT_SECRET as string,
-    code,
-  }).toString();
-
-  const accessTokenURL = `https://github.com/login/oauth/access_token?${accessTokenParams}`;
-  const { error, access_token } = await (
-    await fetch(accessTokenURL, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-      },
-    })
-  ).json();
+  const { access_token, error } = await githubApi.getAccessToken(code);
 
   if (error) {
     return new Response(null, {
@@ -33,14 +20,9 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const userProfileResponse = await fetch('https://api.github.com/user', {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-    cache: 'no-cache',
-  });
+  const { id, avatar_url, login, email } =
+    await githubApi.getUser(access_token);
 
-  const { id, avatar_url, login } = await userProfileResponse.json();
   const user = await db.user.findUnique({
     where: {
       github_id: String(id),
@@ -70,6 +52,7 @@ export async function GET(request: NextRequest) {
       github_id: String(id),
       username: Boolean(username) ? `${login}_${crypto.randomUUID()}` : login,
       avatar: avatar_url,
+      email,
     },
     select: {
       id: true,
