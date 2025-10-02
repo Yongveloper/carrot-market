@@ -37,9 +37,10 @@ async function getProduct(id: number) {
 export default async function ProductDetail({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const id = Number(params.id);
+  const promiseParam = await params;
+  const id = Number(promiseParam.id);
   if (isNaN(id)) {
     return notFound();
   }
