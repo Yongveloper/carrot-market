@@ -60,7 +60,7 @@ export default function AddProduct() {
               <PhotoIcon className="w-20" />
               <div className="text-neural-400 text-sm">
                 사진을 추가해주세요.
-                {state?.fieldErrors.photo}
+                {state?.error.fieldErrors.photo}
               </div>
             </>
           )}
@@ -76,19 +76,22 @@ export default function AddProduct() {
           name="title"
           placeholder="제목"
           type="text"
-          errors={state?.fieldErrors.title}
+          defaultValue={state?.title ?? ''}
+          errors={state?.error.fieldErrors.title}
         />
         <Input
           name="price"
           placeholder="가격"
           type="number"
-          errors={state?.fieldErrors.price}
+          defaultValue={state?.price ?? ''}
+          errors={state?.error.fieldErrors.price}
         />
         <Input
           name="description"
           placeholder="자세한 설명"
           type="text"
-          errors={state?.fieldErrors.description}
+          defaultValue={state?.description ?? ''}
+          errors={state?.error.fieldErrors.description}
         />
         <Button text="작성완료" />
       </form>

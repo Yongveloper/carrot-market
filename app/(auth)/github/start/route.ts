@@ -7,6 +7,7 @@ export async function GET() {
     scope: 'read:user,user:email',
     allow_signup: 'true',
   };
+  console.log('@@params', params);
   const formattedParams = new URLSearchParams(params).toString();
   const finalUrl = `${baseURL}?${formattedParams}`;
 

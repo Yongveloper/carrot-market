@@ -4,7 +4,7 @@ export async function getAccessToken(code: string): Promise<{
 }> {
   const accessTokenParams = new URLSearchParams({
     client_id: process.env.GITHUB_CLIENT_ID as string,
-    client_secret: process.env.GITHUB_CLIENT_CLIENT_SECRET as string,
+    client_secret: process.env.GITHUB_CLIENT_SECRET as string,
     code,
   }).toString();
 

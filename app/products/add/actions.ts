@@ -35,9 +35,9 @@ const productSchema = z.object({
 export async function uploadProduct(_: any, formData: FormData) {
   const data = {
     photo: formData.get('photo'),
-    title: formData.get('title'),
-    price: formData.get('price'),
-    description: formData.get('description'),
+    title: formData.get('title') as string,
+    price: formData.get('price') as string,
+    description: formData.get('description') as string,
   };
 
   if (data.photo instanceof File) {
@@ -51,7 +51,10 @@ export async function uploadProduct(_: any, formData: FormData) {
   console.log(result);
 
   if (!result.success) {
-    return result.error.flatten();
+    return {
+      ...data,
+      error: result.error.flatten(),
+    };
   }
 
   const session = await getSession();
