@@ -1,6 +1,7 @@
 import db from '@/lib/db';
 import getSession from '@/lib/session';
 import { formatToWon } from '@/lib/utils';
+import { deleteCloudflareImageByUrl } from '@/lib/cloudflare';
 import { UserIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -55,6 +56,13 @@ export default async function ProductDetail({
 
   const deleteProduct = async () => {
     'use server';
+
+    // Delete image from Cloudflare first
+    if (product.photo) {
+      await deleteCloudflareImageByUrl(product.photo);
+    }
+
+    // Delete product from database
     await db.product.delete({
       where: {
         id,
