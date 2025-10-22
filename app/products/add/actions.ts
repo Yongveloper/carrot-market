@@ -42,8 +42,6 @@ export async function uploadProduct(_: any, formData: FormData) {
 
   const result = productSchema.safeParse(data);
 
-  console.log(result);
-
   if (!result.success) {
     return {
       ...data,
