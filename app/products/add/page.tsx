@@ -3,9 +3,12 @@
 import Button from '@/components/button';
 import Input from '@/components/input';
 import { PhotoIcon } from '@heroicons/react/24/solid';
-import { useActionState, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { getUploadUrl, uploadProduct } from './actions';
 import z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { productSchema, ProductType } from './schema';
 
 const fileSchema = z.object({
   type: z.string().refine((value) => value.includes('image'), {
@@ -18,9 +21,23 @@ const fileSchema = z.object({
 
 export default function AddProduct() {
   const [preview, setPreview] = useState('');
+  const [file, setFile] = useState<File | null>(null);
 
   const uploadUrlRef = useRef('');
-  const photoIdRef = useRef('');
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductType>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      title: '',
+      price: undefined,
+      description: '',
+    },
+  });
 
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -45,17 +62,20 @@ export default function AddProduct() {
 
     const url = URL.createObjectURL(file);
     setPreview(url);
+    setFile(file);
 
     const { success, result } = await getUploadUrl();
     if (success) {
       const { id, uploadURL } = result;
       uploadUrlRef.current = uploadURL;
-      photoIdRef.current = id;
+      setValue(
+        'photo',
+        `https://imagedelivery.net/nc4rw3MwArTZXyBceodJGA/${id}`,
+      );
     }
   };
 
-  const interceptAction = async (_: any, formData: FormData) => {
-    const file = formData.get('photo');
+  const onSubmit = async (data: ProductType) => {
     if (file === null) {
       return;
     }
@@ -72,17 +92,21 @@ export default function AddProduct() {
       return;
     }
 
-    const photoUrl = `https://imagedelivery.net/nc4rw3MwArTZXyBceodJGA/${photoIdRef.current}`;
-    formData.set('photo', photoUrl);
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('price', String(data.price));
+    formData.append('description', data.description);
+    formData.append('photo', data.photo);
 
-    return uploadProduct(_, formData);
+    return uploadProduct(formData);
   };
-
-  const [state, action] = useActionState(interceptAction, null);
 
   return (
     <div>
-      <form action={action} className="flex flex-col gap-5 p-5">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-5 p-5"
+      >
         <label
           htmlFor="photo"
           className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-neutral-300 bg-cover bg-center text-neutral-300"
@@ -95,7 +119,7 @@ export default function AddProduct() {
               <PhotoIcon className="w-20" />
               <div className="text-neural-400 text-sm">
                 사진을 추가해주세요.
-                {state?.error.fieldErrors.photo}
+                {errors.photo?.message}
               </div>
             </>
           )}
@@ -109,25 +133,22 @@ export default function AddProduct() {
           className="hidden"
         />
         <Input
-          name="title"
           placeholder="제목"
           type="text"
-          defaultValue={state?.title ?? ''}
-          errors={state?.error.fieldErrors.title}
+          {...register('title')}
+          errors={[errors.title?.message ?? '']}
         />
         <Input
-          name="price"
           placeholder="가격"
           type="number"
-          defaultValue={state?.price ?? ''}
-          errors={state?.error.fieldErrors.price}
+          {...register('price')}
+          errors={[errors.price?.message ?? '']}
         />
         <Input
-          name="description"
           placeholder="자세한 설명"
           type="text"
-          defaultValue={state?.description ?? ''}
-          errors={state?.error.fieldErrors.description}
+          {...register('description')}
+          errors={[errors.description?.message ?? '']}
         />
         <Button text="작성완료" />
       </form>
