@@ -4,7 +4,7 @@ import Button from '@/components/button';
 import Input from '@/components/input';
 import { PhotoIcon } from '@heroicons/react/24/solid';
 import { useActionState, useState } from 'react';
-import { uploadProduct } from './actions';
+import { getUploadUrl, uploadProduct } from './actions';
 import z from 'zod';
 
 const fileSchema = z.object({
@@ -18,9 +18,11 @@ const fileSchema = z.object({
 
 export default function AddProduct() {
   const [preview, setPreview] = useState('');
+  const [uploadUrl, setUploadUrl] = useState('');
+
   const [state, action] = useActionState(uploadProduct, null);
 
-  const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
     } = event;
@@ -31,18 +33,24 @@ export default function AddProduct() {
     }
 
     const file = files[0];
-    const result = fileSchema.safeParse(file);
+    const resultFileSchema = fileSchema.safeParse(file);
 
-    if (!result.success) {
+    if (!resultFileSchema.success) {
       alert(
-        result.error.flatten().fieldErrors.type ||
-          result.error.flatten().fieldErrors.size,
+        resultFileSchema.error.flatten().fieldErrors.type ||
+          resultFileSchema.error.flatten().fieldErrors.size,
       );
       return;
     }
 
     const url = URL.createObjectURL(file);
     setPreview(url);
+
+    const { success, result } = await getUploadUrl();
+    if (success) {
+      const { id, uploadURL } = result;
+      setUploadUrl(uploadURL);
+    }
   };
 
   return (
