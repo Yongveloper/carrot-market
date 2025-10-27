@@ -35,6 +35,19 @@ async function getProduct(id: number) {
   return product;
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const promiseParam = await params;
+  const product = await getProduct(Number(promiseParam.id));
+
+  return {
+    title: product?.title,
+  };
+}
+
 export default async function ProductDetail({
   params,
 }: {
