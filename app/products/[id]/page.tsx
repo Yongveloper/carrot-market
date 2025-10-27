@@ -6,6 +6,7 @@ import { UserIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import { revalidateTag, unstable_cacheTag } from 'next/cache';
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -18,6 +19,11 @@ async function getIsOwner(userId: number) {
 }
 
 async function getProduct(id: number) {
+  'use cache';
+
+  unstable_cacheTag('product-detail');
+  unstable_cacheTag('aaa');
+  console.log('product!');
   const product = await db.product.findUnique({
     where: {
       id,
@@ -35,13 +41,32 @@ async function getProduct(id: number) {
   return product;
 }
 
+async function getProductTitle(id: number) {
+  'use cache';
+
+  unstable_cacheTag('product-title');
+  unstable_cacheTag('aaa');
+  console.log('title!');
+
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      title: true,
+    },
+  });
+
+  return product;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const promiseParam = await params;
-  const product = await getProduct(Number(promiseParam.id));
+  const product = await getProductTitle(Number(promiseParam.id));
 
   return {
     title: product?.title,
@@ -66,6 +91,11 @@ export default async function ProductDetail({
   }
 
   const isOwner = await getIsOwner(product.userId);
+
+  const revalidate = async () => {
+    'use server';
+    revalidateTag('product-detail');
+  };
 
   const deleteProduct = async () => {
     'use server';
@@ -121,9 +151,9 @@ export default async function ProductDetail({
           {formatToWon(product.price)}
         </span>
         {isOwner && (
-          <form action={deleteProduct}>
+          <form action={revalidate}>
             <button className="cursor-pointer rounded-md bg-red-500 px-5 py-2.5 font-semibold text-white">
-              삭제하기
+              Revalidate title cached
             </button>
           </form>
         )}
