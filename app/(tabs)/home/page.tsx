@@ -3,15 +3,11 @@ import db from '@/lib/db';
 import { Prisma } from '@/lib/generated/prisma';
 import { PlusIcon } from '@heroicons/react/20/solid';
 import { Metadata } from 'next';
+import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
-import { unstable_cacheLife } from 'next/cache';
 
 async function getInitialProducts() {
   'use cache';
-
-  unstable_cacheLife({
-    revalidate: 60,
-  });
 
   console.log('hittt!!');
   const products = await db.product.findMany({
@@ -39,9 +35,17 @@ export const metadata: Metadata = {
 
 export default async function Products() {
   const initialProducts = await getInitialProducts();
+  const revalidate = async () => {
+    'use server';
+    revalidatePath('/home');
+  };
+
   return (
     <div>
       <ProductList initialProducts={initialProducts} />
+      <form action={revalidate}>
+        <button>Revalidate</button>
+      </form>
       <Link
         href="/products/add"
         className="fixed right-8 bottom-24 flex size-16 items-center justify-center rounded-full bg-orange-500 text-white transition-colors hover:bg-orange-400"
