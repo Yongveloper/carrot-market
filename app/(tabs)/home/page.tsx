@@ -4,11 +4,16 @@ import { Prisma } from '@/lib/generated/prisma';
 import { PlusIcon } from '@heroicons/react/20/solid';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { unstable_cacheLife } from 'next/cache';
 
 async function getInitialProducts() {
   'use cache';
-  console.log('hittt!!');
 
+  unstable_cacheLife({
+    revalidate: 60,
+  });
+
+  console.log('hittt!!');
   const products = await db.product.findMany({
     select: {
       title: true,
