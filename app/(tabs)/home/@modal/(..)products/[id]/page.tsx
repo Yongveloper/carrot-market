@@ -1,7 +1,7 @@
 import CloseButton from '@/components/close-button';
 import db from '@/lib/db';
 import { formatToWon } from '@/lib/utils';
-import { PhotoIcon, UserIcon } from '@heroicons/react/20/solid';
+import { UserIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 

@@ -10,7 +10,6 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import getSession from '@/lib/session';
 import sessionLogin from '@/lib/sessionLogin';
 
 const checkUsername = (username: string) => !username.includes('lala');
@@ -89,7 +88,7 @@ const formSchema = z
     path: ['confirm_password'],
   });
 
-export async function createAccount(prevState: any, formData: FormData) {
+export async function createAccount(_prevState: unknown, formData: FormData) {
   console.log(cookies());
   const data = {
     username: formData.get('username') as string,

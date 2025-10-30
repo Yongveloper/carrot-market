@@ -97,7 +97,7 @@ export default async function ProductDetail({
     revalidateTag('product-detail');
   };
 
-  const deleteProduct = async () => {
+  const _deleteProduct = async () => {
     'use server';
 
     // Delete image from Cloudflare first

@@ -11,9 +11,9 @@ interface IProductListProps {
 
 export default function ProductList({ initialProducts }: IProductListProps) {
   const [products, setProducts] = useState(initialProducts);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [isLastPage, setIsLastPage] = useState(false);
+  const [_isLastPage, setIsLastPage] = useState(false);
 
   const trigger = useRef<HTMLSpanElement>(null);
 

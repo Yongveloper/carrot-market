@@ -6,7 +6,6 @@ import {
   PASSWORD_REGEX_ERROR,
 } from '@/lib/constants';
 import db from '@/lib/db';
-import getSession from '@/lib/session';
 import bcrypt from 'bcrypt';
 import sessionLogin from '@/lib/sessionLogin';
 import z from 'zod';
@@ -39,7 +38,7 @@ const formSchema = z.object({
     .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
 });
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(_prevState: unknown, formData: FormData) {
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
