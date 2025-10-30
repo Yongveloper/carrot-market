@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 
 async function getInitialProducts() {
-  'use cache';
+  // 'use cache';
 
   console.log('hittt!!');
   const products = await db.product.findMany({
@@ -32,6 +32,8 @@ export type InitialProducts = Prisma.PromiseReturnType<
 export const metadata: Metadata = {
   title: 'Home',
 };
+
+export const revalidate = 60;
 
 export default async function Products() {
   const initialProducts = await getInitialProducts();
